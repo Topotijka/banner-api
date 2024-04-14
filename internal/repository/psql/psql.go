@@ -7,6 +7,7 @@ import (
 	"github.com/lib/pq"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type BannerRepo struct {
@@ -33,18 +34,22 @@ func PGDBInit(db *sql.DB) error {
 	return nil
 }
 
-func NewPostgresDB(connStr string) (*sql.DB, error) {
+func NewPostgresDB(connStr string) *sql.DB {
 
 	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		panic(err)
+	}
 
-	if err != nil {
-		return nil, err
+	for {
+		err := db.Ping()
+		if err == nil {
+			break
+		}
+		fmt.Println("Waiting for the database to become ready...")
+		time.Sleep(1 * time.Second)
 	}
-	err = db.Ping()
-	if err != nil {
-		return nil, err
-	}
-	return db, nil
+	return db
 }
 
 func (r *BannerRepo) GetUserBanner(tagId int16, featureId int16) (*model.Banner, error) {
@@ -58,7 +63,7 @@ func (r *BannerRepo) GetUserBanner(tagId int16, featureId int16) (*model.Banner,
 	defer rows.Close()
 
 	for rows.Next() {
-		var tagIds pq.Int64Array
+		var tagIds pq.Int32Array
 		if err := rows.Scan(&banner.Id, &tagIds, &banner.FeatureId, &banner.Content, &banner.IsActive,
 			&banner.CreatedAt, &banner.UpdatedAt); err != nil {
 			return nil, err
@@ -73,7 +78,7 @@ func (r *BannerRepo) GetUserBanner(tagId int16, featureId int16) (*model.Banner,
 	return &banner, nil
 }
 
-func int16ArrayToSlice(arr pq.Int64Array) []int16 {
+func int16ArrayToSlice(arr pq.Int32Array) []int16 {
 	slice := make([]int16, len(arr))
 	for i, v := range arr {
 		slice[i] = int16(v)

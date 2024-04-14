@@ -2,6 +2,7 @@ package main
 
 import (
 	"banner-api/internal/cache"
+	"banner-api/internal/config"
 	"banner-api/internal/handlers"
 	"banner-api/internal/repository/psql"
 	"banner-api/internal/service"
@@ -14,13 +15,15 @@ import (
 
 func main() {
 
-	connStr := "user=postgres dbname=banners sslmode=disable password=123456 host=localhost port=5432"
-	db, err := psql.NewPostgresDB(connStr)
-	if err != nil {
-		panic("failed to connect to database")
-	}
+	connectionStr := config.DBConnectionString()
+
+	db := psql.NewPostgresDB(connectionStr)
 	defer db.Close()
-	psql.PGDBInit(db)
+	err := psql.PGDBInit(db)
+	if err != nil {
+		panic(err)
+	}
+
 	bannerCache := cache.NewBannerCache()
 
 	go bannerCache.StartCleanup()

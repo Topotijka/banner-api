@@ -17,7 +17,7 @@ Authorization: Bearer admin_token
 }
 
 ###
-GET /user_banner?tag_id=2&feature_id=456&use_last_revision=true HTTP/1.1
+GET /user_banner?tag_id=2&feature_id=456&use_last_revision=false HTTP/1.1
 Host: localhost:8080
 Authorization: Bearer user_token
 ###

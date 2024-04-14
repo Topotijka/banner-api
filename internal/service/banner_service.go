@@ -31,6 +31,7 @@ func (s *BannerService) GetUserBanner(tagId int16, featureId int16, useLastRevis
 		if err != nil && banner != nil {
 			s.BannerCache.NewBanner(banner.Id, banner)
 		}
+
 	case false:
 		banner, found = s.BannerCache.GetUserBanner(tagId, featureId)
 		if !found {
@@ -40,7 +41,7 @@ func (s *BannerService) GetUserBanner(tagId int16, featureId int16, useLastRevis
 			}
 		}
 	}
-	if banner != nil && err == nil {
+	if banner != nil {
 		if !banner.IsActive {
 			switch role {
 
@@ -48,12 +49,13 @@ func (s *BannerService) GetUserBanner(tagId int16, featureId int16, useLastRevis
 				return banner.Content, err
 
 			case middleware.UserRole:
-				return []byte(`{}`), err
+				if !banner.IsActive {
+					return []byte(`{}`), err
+				}
 			}
 		}
 	}
-
-	return nil, err
+	return banner.Content, err
 }
 
 func (s *BannerService) GetBanners(tagId int16, featureId int16, limit int64, offset int64) ([]model.Banner, error) {
@@ -75,6 +77,7 @@ func (s *BannerService) NewBanner(br model.BannerRequest) (int64, error) {
 
 func (s *BannerService) UpdateBanner(id int64, params map[string]interface{}) error {
 	err := s.BannerRepo.UpdateBanner(id, params)
+	s.BannerCache.SetBanner(id, params)
 	return err
 
 }
