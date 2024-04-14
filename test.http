@@ -1,0 +1,69 @@
+
+
+POST /banner HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Authorization: Bearer admin_token
+
+{
+  "tag_ids": [1, 2, 3],
+  "feature_id": 123,
+  "content": {
+    "title": "updated_title",
+    "text": "updated_text",
+    "url": "updated_url"
+  },
+  "is_active": true
+}
+
+###
+GET /user_banner?tag_id=2&feature_id=456&use_last_revision=true HTTP/1.1
+Host: localhost:8080
+Authorization: Bearer user_token
+###
+GET /user_banner?tag_id=2&feature_id=123&use_last_revision=true HTTP/1.1
+Host: localhost:8080
+Authorization: Bearer user_token
+###
+GET /banner?feature_id=123&tag_id=456&limit=10&offset=0 HTTP/1.1
+Host: localhost:8080
+Authorization: Bearer admin_token
+
+###
+PATCH /banner/2 HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Authorization: Bearer admin_token
+
+{
+  "tag_ids": [4, 5, 6],
+  "feature_id": 123,
+  "content": {
+    "title": "updated_title",
+    "text": "updated_text",
+    "url": "updated_url"
+  },
+  "is_active": true
+}
+
+###
+PATCH /banner/3 HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+Authorization: Bearer admin_token
+
+{
+  "tag_ids": [4, 5, 6],
+  "feature_id": 123,
+  "content": {
+    "title": "updated_title",
+    "text": "updated_text",
+    "url": "updated_url"
+  },
+  "is_active": true
+}
+###
+DELETE /banner/789 HTTP/1.1
+Host: localhost:8080
+Authorization: Bearer admin_token
+###
